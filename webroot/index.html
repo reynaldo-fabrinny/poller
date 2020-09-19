@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome to KRY</title>
-</head>
-<body>
-KRY status poller
-<ul id="service-list">
-</ul>
-<input type="text" id="url-name">
-<button id="post-service">Save</button>
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome to KRY Poller</title>
+    </head>
+    <body>
+    <h2>-- KRY poller status--</h2>
+    <ul id="service-list"></ul>
 
-</body>
-<script src="static/code.js">
-</script>
+    <br>
+    <form>
+        <label for="service-name">Service name</label><br>
+        <input type="text" id="service-name"><br>
+        <br>
+        <label for="service-url">Service URL*</label><br>
+        <input type="text" id="service-url" required>
+
+        <input type="submit" id="post-service">
+    </form>
+    </body>
+    <script src="static/code.js"></script>
 </html>
