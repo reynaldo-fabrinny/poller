@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="se.kry.codetest.TestMainVerticle" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-09-19T10:00:41" hostname="DESKTOP-6S15EKC" time="1.525">
+  <properties/>
+  <testcase name="start_http_server(Vertx, VertxTestContext)" classname="se.kry.codetest.TestMainVerticle" time="1.525"/>
+  <system-out><![CDATA[KRY code test service started
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
