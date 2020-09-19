@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="poller" uuid="01a70f06-de28-468c-9559-ba594425d905">
+    <data-source source="LOCAL" name="poller.db" uuid="7b3f91bd-6617-4204-9ca0-bbbda1e8aafa">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\ReynaldoTibúrcio\Desktop\poller\poller.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/poller.db</jdbc-url>
     </data-source>
   </component>
 </project>
