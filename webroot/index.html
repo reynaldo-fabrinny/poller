@@ -46,18 +46,22 @@
             <div class="row">
                 <div class="col-3">
                     <div class="form-group">
-                        <label for="service-name">Service name</label>
-                        <input class="form-control" type="text" id="service-name">
+                        <div class="form-check">
+                            <label class="form-check-label" for="service-name">Service name</label>
+                            <input class="form-control" type="text" id="service-name">
+                        </div>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="form-group">
-                        <label for="service-url">Service URL*</label>
-                        <input class="form-control" type="text" id="service-url" required>
+                        <div class="form-check">
+                            <label class="form-check-label" for="service-url">Service URL*</label>
+                            <input class="form-control" type="text" id="service-url" required>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 mt-1 text-right">
-                    <input class="btn btn-sm btn-primary" type="submit" id="post-service">
+                    <button class="btn btn-sm btn-primary" type="submit" id="post-service"> Add Service</button>
                 </div>
             </div>
         </div>
