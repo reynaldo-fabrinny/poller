@@ -11,6 +11,15 @@ public class Constants {
     public static final String DATA_BASE_NAME = "services";
 
     /**
+     * The constant DEFAULT_PORT.
+     */
+    public static final int DEFAULT_PORT = 8085;
+
+    /**
+     * The constant ID.
+     */
+    public static final String ID = "id";
+    /**
      * The constant NAME.
      */
     public static final String NAME = "name";
@@ -35,4 +44,9 @@ public class Constants {
      * The constant DATE_PATTERN.
      */
     public static final String DATE_PATTERN = "HH:mm:ss dd-MM-yyyy";
+
+    /**
+     * The constant REFRESH_DEFAULT_TIME.
+     */
+    public static final int REFRESH_DEFAULT_TIME = 1000 * 60;
 }
