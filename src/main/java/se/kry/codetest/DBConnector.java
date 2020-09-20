@@ -4,18 +4,21 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import se.kry.codetest.utils.Constants;
 
 /**
- * Database Facade Layer responsible for all the interactions with the Database.
+ * Database Layer responsible for all the interactions with the Database.
  */
 public class DBConnector {
 
     private final String DB_PATH = "poller.db";
     private final SQLClient client;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Instantiates a new Db connector.
@@ -27,8 +30,6 @@ public class DBConnector {
                 .put("url", "jdbc:sqlite:" + DB_PATH)
                 .put("driver_class", "org.sqlite.JDBC")
                 .put("max_pool_size", 30);
-
-        // TODO  https://vertx.io/docs/vertx-jdbc-client/java/ check if
         client = JDBCClient.createShared(vertx, config);
     }
 
@@ -43,7 +44,8 @@ public class DBConnector {
         client.query("SELECT " + Constants.URL + ", " +
                 Constants.STATUS_RESPONSE + ", " +
                 Constants.NAME + ", " +
-                Constants.CREATION_DATE + " FROM " + Constants.DATA_BASE_NAME, response -> {
+                Constants.CREATION_DATE + ", " +
+                Constants.ID + " FROM " + Constants.DATA_BASE_NAME, response -> {
             if (response.succeeded()) {
                 queryResultFuture.complete(response.result());
             } else
@@ -58,46 +60,51 @@ public class DBConnector {
      * @param service the service
      */
     public void addService(JsonObject service) {
-        client.query("INSERT INTO services (" +
+        client.update("INSERT INTO " + Constants.DATA_BASE_NAME + " (" +
                         Constants.NAME + "," +
                         Constants.URL + "," +
                         Constants.CREATION_DATE + ") VALUES ('" +
                         service.getString(Constants.NAME) + "', '" +
                         service.getString(Constants.URL) + "', '" +
-                        service.getString(Constants.CREATION_DATE) + "');"
-                , response -> {
-                    if (response.failed()) {
-                        System.out.println("Was not possible to insert the service. " + response.cause());
+                        service.getString(Constants.CREATION_DATE) + "');",
+                ar -> {
+                    if (ar.failed()) {
+                        logger.error("Was not possible to insert the service. " + ar.cause());
                     }
                 });
     }
 
     /**
-     * Delete service.
+     * Deletes a service by its ID.
      *
-     * @param url the url
+     * @param id the id
      */
-    public void deleteService(String url) {
-
+    public void deleteService(String id) {
+        client.update("DELETE FROM " + Constants.DATA_BASE_NAME + " WHERE id = '" + id + "'",
+                ar -> {
+                    if (ar.failed()) {
+                        logger.error("Was not possible to delete the service with the following id: " + id + " " +
+                                ar.cause());
+                    }
+                });
     }
 
     /**
-     * Update service.
+     * Updates the Response Status from the Specified Service.
      *
-     * @param url the url
+     * @param id              the id
+     * @param status_response the status response
      */
-    public void updateService(String url) {
-
-    }
-
-    /**
-     * Service exists boolean.
-     *
-     * @param url the url
-     * @return the boolean
-     */
-    public boolean serviceExists(String url) {
-        return false;
+    public void updateServiceStatusResponse(String id, int status_response) {
+        client.update("UPDATE " + Constants.DATA_BASE_NAME + " SET " + Constants.STATUS_RESPONSE + " = " + status_response +
+                        " WHERE " + Constants.ID + " = " + id,
+                ar -> {
+                    if (ar.failed()) {
+                        logger.error("Was not possible to update the status response from the service " +
+                                "with the following id: " + id + " " +
+                                ar.cause());
+                    }
+                });
     }
 
     /**
