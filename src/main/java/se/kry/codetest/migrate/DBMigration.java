@@ -12,10 +12,10 @@ public class DBMigration {
         Vertx vertx = Vertx.vertx();
         DBConnector connector = new DBConnector(vertx);
         connector.query("CREATE TABLE IF NOT EXISTS services (" +
-                "id int NOT NULL AUTO_INCREMENT," +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "url VARCHAR(128) NOT NULL UNIQUE, " +
                 "name VARCHAR(128)," +
-                "status_response TINYINT(1)," +
+                "status_response INTEGER," +
                 "creation_date DATETIME2(3)," +
                 "last_modified DATETIME2(3))").onComplete(done -> {
             if (done.succeeded()) {
