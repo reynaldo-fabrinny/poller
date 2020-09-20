@@ -84,7 +84,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void setAddServiceRouter(Router router) {
-        router.post("/add").handler(req -> {
+        router.post("/service").handler(req -> {
             JsonObject jsonBody = req.getBodyAsJson();
 
             if (!Utils.isValidUrl(jsonBody.getString(Constants.URL))) {

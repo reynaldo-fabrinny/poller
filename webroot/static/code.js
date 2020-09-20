@@ -57,7 +57,7 @@ fetch(servicesRequest)
 $('#post-service').click(function () {
     let serviceUrl = document.querySelector('#service-url').value;
     let serviceName = document.querySelector('#service-name').value;
-    fetch('/add', {
+    fetch('/service', {
         method: 'post',
         headers: {
             'Accept': 'application/json, text/plain, */*',
