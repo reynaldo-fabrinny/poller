@@ -14,7 +14,7 @@ import java.util.Date;
 public class Utils {
 
     /**
-     * Gets now.
+     * Gets now based on the Time Zone and with the follow date pattern.
      *
      * @return the now
      */
