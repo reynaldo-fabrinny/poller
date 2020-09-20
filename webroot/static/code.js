@@ -66,7 +66,3 @@ $('#post-service').click(function () {
         body: JSON.stringify({url: serviceUrl, name: serviceName})
     }).then(res => location.reload());
 });
-
-$(document).ready(function(){
-
-});
