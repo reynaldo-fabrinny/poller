@@ -1,4 +1,3 @@
-
 const $tableBody = $("#table-body");
 const urlRegex = /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?/;
 let servicesRequest = new Request('/service');
@@ -14,8 +13,10 @@ fetch(servicesRequest)
             let $tdUrl = $('<td/>');
             $tdUrl.addClass("col-4");
 
-            let $inputUrl = $("<input style='border: none;' required/>");
+            let $inputUrl = $("<input style='background-color: white !important;' required/>");
             $inputUrl.attr("disabled", true);
+            $inputUrl.addClass("form-control");
+            $inputUrl.addClass("no-border");
             $inputUrl.val(service.url);
             $tdUrl.append($inputUrl);
 
@@ -24,8 +25,10 @@ fetch(servicesRequest)
 
             $tdName.addClass("col-3");
 
-            let $inputName = $("<input style='border: none;' />");
+            let $inputName = $("<input style=' background-color: white !important;' />");
             $inputName.attr("disabled", true);
+            $inputName.addClass("form-control");
+            $inputName.addClass("no-border");
             $inputName.val(service.name);
 
             $tdName.append($inputName);
@@ -73,6 +76,8 @@ fetch(servicesRequest)
                     $(this).toggle();
                     $saveBtn.toggle();
                     $inputName.attr("disabled", false);
+                    $inputName.removeClass("no-border");
+                    $inputUrl.removeClass("no-border");
                     $inputUrl.attr("disabled", false);
 
                 }).addClass("btn btn-sm btn-secondary ml-2");
@@ -88,6 +93,9 @@ fetch(servicesRequest)
 
                         $(this).toggle();
                         $editBtn.toggle();
+
+                        $inputName.addClass("no-border");
+                        $inputUrl.addClass("no-border");
                         $inputName.attr("disabled", true);
                         $inputUrl.attr("disabled", true);
 
@@ -103,7 +111,7 @@ fetch(servicesRequest)
                                 name: $inputName.val(),
                                 url: $inputUrl.val()
                             })
-                        }).then(res => location.reload());
+                        }).then(res => $tr.reload());
                     } else {
                         alert("invalid url");
                     }
@@ -117,19 +125,20 @@ fetch(servicesRequest)
     });
 
 $('#post-service').click(function () {
-    let serviceUrl = document.querySelector('#service-url').value;
-    let serviceName = document.querySelector('#service-name').value;
+    if ($("#new-service-form").valid()) {
+        let serviceUrl = document.querySelector('#service-url').value;
+        let serviceName = document.querySelector('#service-name').value;
 
-    fetch('/service', {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({url: serviceUrl, name: serviceName})
-    }).then(res => location.reload());
+        fetch('/service', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({url: serviceUrl, name: serviceName})
+        }).then(res => location.reload());
+    }
 });
-
 
 $("#new-service-form").validate({
     rules: {
@@ -147,5 +156,5 @@ $("#new-service-form").validate({
 });
 
 function isValidUrl(url) {
-    return urlRegex.test(url)
+    return urlRegex.test(url) && !(/\s/.test(url));
 }

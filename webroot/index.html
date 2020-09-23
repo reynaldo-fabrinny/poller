@@ -9,15 +9,22 @@
           rel="stylesheet"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
           crossorigin="anonymous">
+    <style>
+        .no-border {
+            border: none;
+        }
+    </style>
     <title>Welcome to KRY Poller</title>
 </head>
 <body>
-<div class="ml-3 mb-4">
-    <h2>KRY poller status</h2>
+<div class="row ml-3 my-2">
+    <div class="col-12">
+        <h2>KRY poller status</h2>
+    </div>
 </div>
 <div class="row ml-3">
-    <div class="col-6">
-        <table class="table table-striped">
+    <div class="col-8">
+        <table class="table">
             <thead>
             <tr class="d-flex">
                 <th class="col-4" id="">
@@ -49,18 +56,18 @@
                 <div class="col-4">
                     <div class="form-group">
                         <div class="form-check">
-                            <label class="form-check-label" for="service-name">Service Name</label>
-                            <input class="form-control" type="text" name="service-name" id="service-name"
-                                   placeholder="i.e: Kry website">
+                            <label class="form-check-label" for="service-url">Service URL*</label>
+                            <input class="form-control" type="text" name="service-url" id="service-url"
+                                   placeholder="i.e: https://kry.se">
                         </div>
                     </div>
                 </div>
                 <div class="col-4">
                     <div class="form-group">
                         <div class="form-check">
-                            <label class="form-check-label" for="service-url">Service URL*</label>
-                            <input class="form-control" type="text" name="service-url" id="service-url"
-                                   placeholder="i.e: https://kry.se">
+                            <label class="form-check-label" for="service-name">Service Name</label>
+                            <input class="form-control" type="text" name="service-name" id="service-name"
+                                   placeholder="i.e: Kry website">
                         </div>
                     </div>
                 </div>
