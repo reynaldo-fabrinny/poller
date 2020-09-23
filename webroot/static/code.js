@@ -1,14 +1,32 @@
-const $tableBody = $("#table-body");
+import {getCookie} from "./cookiesUtil.js";
+
 const urlRegex = /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?/;
 let servicesRequest = new Request('/service');
+
+let eb = new EventBus(window.location.protocol + "//" + window.location.host + "/eventbus");
+
+eb.onopen = function () {
+    eb.registerHandler("page.updated", function (error, message) {
+        let body = $.parseJSON(message.body);
+        $("#table-body").replaceWith(fillTable(body));
+    });
+};
 
 fetch(servicesRequest)
     .then(function (response) {
         return response.json();
     })
     .then(function (serviceList) {
-        serviceList.forEach(service => {
-            let $tr = $('<tr/>').addClass("d-flex");
+        $("#table-body").replaceWith(fillTable(serviceList));
+    });
+
+function fillTable(serviceList) {
+    let $body = $('<tbody id="table-body" />');
+    serviceList.forEach(service => {
+
+        if (service.user_cookie_id === getCookie()) {
+            let $tr = $('<tr id="tr-' + service.id + '" />').addClass("d-flex");
+
 
             let $tdUrl = $('<td/>');
             $tdUrl.addClass("col-4");
@@ -64,7 +82,7 @@ fetch(servicesRequest)
                             'Accept': 'application/json, text/plain, */*',
                             'Content-Type': 'application/json'
                         }
-                    }).then(res => location.reload());
+                    }).then($("#tr-" + serviceId).remove());
                 }).addClass("btn btn-sm btn-danger");
             $tdButton.append($deleteBtn);
 
@@ -90,7 +108,6 @@ fetch(servicesRequest)
                 .attr("service-id", service.id)
                 .click(function () {
                     if (isValidUrl($inputUrl.val())) {
-
                         $(this).toggle();
                         $editBtn.toggle();
 
@@ -111,7 +128,7 @@ fetch(servicesRequest)
                                 name: $inputName.val(),
                                 url: $inputUrl.val()
                             })
-                        }).then(res => $tr.reload());
+                        }).then();
                     } else {
                         alert("invalid url");
                     }
@@ -120,9 +137,11 @@ fetch(servicesRequest)
             $tdButton.append($saveBtn);
 
             $tr.append($tdButton);
-            $tableBody.append($tr);
-        });
+            $body.append($tr);
+        }
     });
+    return $body;
+}
 
 $('#post-service').click(function () {
     if ($("#new-service-form").valid()) {
