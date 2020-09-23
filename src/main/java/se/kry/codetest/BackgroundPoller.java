@@ -1,9 +1,10 @@
 package se.kry.codetest;
 
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.sql.ResultSet;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -22,26 +23,23 @@ public class BackgroundPoller {
     /**
      * Poll services future.
      *
-     * @param connector the connector
+     * @param vertx
      * @return the future
      */
-    public Future<List<String>> pollServices(DBConnector connector) {
-        connector.getServices().onComplete(ar -> {
+    public Future<List<String>> pollServices(Future<ResultSet> futureSet, Vertx vertx) {
+        DBConnector connector = new DBConnector(vertx);
+        futureSet.onComplete(ar -> {
             if (ar.succeeded()) {
-                List<JsonArray> results = ar.result().getResults();
-                if (!results.isEmpty()) {
-                    ar.result().getResults().forEach(service -> {
-                        try {
-                            int serviceId = Integer.parseInt(service.getValue(4).toString());
-                            String serviceURL = service.getValue(0).toString();
-                            int response = getResponseCodeFromUrl(serviceURL);
-                            connector.updateServiceStatusResponse(serviceId, response);
-                        } catch (NumberFormatException e) {
-                            Future.failedFuture("Invalid Service ID.");
-                        }
-                    });
-
-                }
+                ar.result().getResults().forEach(service -> {
+                    try {
+                        int serviceId = Integer.parseInt(service.getValue(4).toString());
+                        String serviceURL = service.getValue(0).toString();
+                        int response = getResponseCodeFromUrl(serviceURL);
+                        connector.updateServiceStatusResponse(serviceId, response);
+                    } catch (NumberFormatException e) {
+                        Future.failedFuture("Invalid Service ID.");
+                    }
+                });
             } else {
                 logger.error("Could not poll the services.");
             }

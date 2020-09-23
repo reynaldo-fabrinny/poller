@@ -33,7 +33,6 @@ public class DBConnector {
         client = JDBCClient.createShared(vertx, config);
     }
 
-
     public Future<ResultSet> getServices(String userCookieId) {
         Future<ResultSet> queryResultFuture = Future.future();
         String cookieQuery = "";
@@ -122,6 +121,7 @@ public class DBConnector {
 
     /**
      * Update service.
+     * Sets the STATUS_RESPONSE back to 0.
      *
      * @param id      the id
      * @param service the service
@@ -129,6 +129,7 @@ public class DBConnector {
     public void updateService(int id, JsonObject service) {
         client.update("UPDATE " + Constants.DATA_BASE_NAME + " SET " +
                         Constants.NAME + " = '" + service.getString(Constants.NAME) + "', " +
+                        Constants.STATUS_RESPONSE + " = " + 0 + " , " +
                         Constants.URL + " = '" + service.getString(Constants.URL) +
                         "' WHERE " + Constants.ID + " = " + id,
                 ar -> {

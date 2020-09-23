@@ -7,7 +7,6 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.Timeout;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(VertxExtension.class)
 public class TestMainVerticle {
-
 
     /**
      * Deploy verticle.
@@ -121,8 +119,8 @@ public class TestMainVerticle {
                 }));
     }
 
-    // TODO Test service  visibility by cookie
-    // TODO test update with invalid url
+    // TODO Test service visibility by cookie
+
 
     @Test
     @DisplayName("Test get Services")
@@ -200,5 +198,32 @@ public class TestMainVerticle {
 
     }
 
+    @Test
+    @DisplayName("Test update service with Invalid URL")
+    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+    void updateServiceInvalidUrl(Vertx vertx, VertxTestContext testContext) {
+        JsonObject newService = new JsonObject().
+                put(Constants.URL, "https://soundcloud.com/")
+                .put(Constants.NAME, "Sound Cloud");
+
+        WebClient.create(vertx)
+                .post(Constants.DEFAULT_PORT, "::1", "/service")
+                .sendJsonObject(newService, response -> testContext.verify(() -> {
+
+                    JsonObject upService = new JsonObject()
+                            .put(Constants.ID, "1")
+                            .put(Constants.URL, "www.soundcloud.com/discover")
+                            .put(Constants.NAME, "Sound Cloud UPDATED");
+
+                    WebClient.create(vertx)
+                            .put(Constants.DEFAULT_PORT, "::1", "/service")
+                            .sendJsonObject(upService, r -> testContext.verify(() -> {
+                                assertEquals(405, r.result().statusCode());
+                                testContext.completeNow();
+                            }));
+
+                }));
+
+    }
 
 }

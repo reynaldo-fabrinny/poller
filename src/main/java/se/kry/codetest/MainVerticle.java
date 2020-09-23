@@ -32,7 +32,8 @@ public class MainVerticle extends AbstractVerticle {
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
 
-        vertx.setPeriodic(Constants.REFRESH_DEFAULT_TIME, timerId -> poller.pollServices(connector));
+        vertx.setPeriodic(Constants.REFRESH_DEFAULT_TIME, timerId ->
+                poller.pollServices(connector.getServices(), vertx));
         setRoutes(router);
 
         vertx
@@ -49,7 +50,6 @@ public class MainVerticle extends AbstractVerticle {
                 });
     }
 
-    //TOD CHECK    .handler(TimeoutHandler.create(5000)
     private void setRoutes(Router router) {
         router.route("/*").handler(StaticHandler.create());
 
@@ -140,6 +140,12 @@ public class MainVerticle extends AbstractVerticle {
 
             try {
                 int serviceId = Integer.parseInt(jsonBody.getString(Constants.ID));
+                if (!Utils.isValidUrl(jsonBody.getString(Constants.URL))) {
+                    logger.error("Not allowed.");
+                    req.fail(405);
+                    return;
+                }
+
                 connector.updateService(serviceId, jsonBody);
                 req.response()
                         .setStatusCode(200)
