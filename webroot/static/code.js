@@ -1,4 +1,3 @@
-//import {cookieName, setCookie, getCookie} from "./cookiesUtils.js";
 
 const $tableBody = $("#table-body");
 const urlRegex = /(http|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?/;
@@ -10,9 +9,6 @@ fetch(servicesRequest)
     })
     .then(function (serviceList) {
         serviceList.forEach(service => {
-
-            //    let cookieUserId = getCookie(cookieName);
-            //  if (cookieUserId === service.user_cookie_id) {
             let $tr = $('<tr/>').addClass("d-flex");
 
             let $tdUrl = $('<td/>');
@@ -117,7 +113,6 @@ fetch(servicesRequest)
 
             $tr.append($tdButton);
             $tableBody.append($tr);
-            //   }
         });
     });
 
@@ -125,19 +120,12 @@ $('#post-service').click(function () {
     let serviceUrl = document.querySelector('#service-url').value;
     let serviceName = document.querySelector('#service-name').value;
 
-    /* let cookie = getCookie(cookieName);
-     if (!cookie) {
-         cookie = setCookie(cookieName);
-     }
-     cookie += "";*/
-
     fetch('/service', {
         method: 'post',
         headers: {
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
         },
-//        body: JSON.stringify({url: serviceUrl, name: serviceName, user_cookie_id: cookie})
         body: JSON.stringify({url: serviceUrl, name: serviceName})
     }).then(res => location.reload());
 });
