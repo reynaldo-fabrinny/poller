@@ -13,6 +13,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 import se.kry.codetest.utils.Constants;
 import se.kry.codetest.utils.Utils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,7 @@ public class MainVerticle extends AbstractVerticle {
 
             if (!Utils.isValidUrl(jsonBody.getString(Constants.URL))) {
                 logger.error("Invalid URL");
+                req.fail(401);
                 return;
             }
             Cookie cookie = req.getCookie(Constants.COOKIE_ID);
@@ -110,9 +112,9 @@ public class MainVerticle extends AbstractVerticle {
             jsonBody.put(Constants.CREATION_DATE, Utils.getNow());
             connector.addService(jsonBody);
             req.response()
-                    .setStatusCode(200)
+                    .setStatusCode(201)
                     .putHeader("content-type", "text/plain")
-                    .end("OK");
+                    .end("CREATED");
         });
     }
 
@@ -142,8 +144,12 @@ public class MainVerticle extends AbstractVerticle {
                 req.response()
                         .setStatusCode(200)
                         .putHeader("content-type", "text/plain")
-                        .end("OK");
+                        .end(new JsonArray(Collections.singletonList(jsonBody)).encode());
+            } catch (ClassCastException ex) {
+                logger.error("Invalid Service ID.");
+                req.fail(500);
             } catch (NumberFormatException e) {
+                logger.error("Invalid Service ID.");
                 req.fail(404);
             }
         });
