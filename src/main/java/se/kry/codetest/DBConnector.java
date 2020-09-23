@@ -18,7 +18,7 @@ public class DBConnector {
 
     private final String DB_PATH = "poller.db";
     private final SQLClient client;
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Instantiates a new Db connector.
@@ -33,25 +33,36 @@ public class DBConnector {
         client = JDBCClient.createShared(vertx, config);
     }
 
+
+    public Future<ResultSet> getServices(String userCookieId) {
+        Future<ResultSet> queryResultFuture = Future.future();
+        String cookieQuery = "";
+        if (userCookieId != null) {
+            cookieQuery = " WHERE " + Constants.USER_COOKIE_ID + " = '" + userCookieId + "' ";
+        }
+        client.query("SELECT " + Constants.URL + ", " +
+                        Constants.STATUS_RESPONSE + ", " +
+                        Constants.NAME + ", " +
+                        Constants.CREATION_DATE + ", " +
+                        Constants.ID + ", " +
+                        Constants.USER_COOKIE_ID + " FROM " + Constants.DATA_BASE_NAME +
+                        cookieQuery
+                , response -> {
+                    if (response.succeeded()) {
+                        queryResultFuture.complete(response.result());
+                    } else
+                        queryResultFuture.fail(response.cause());
+                });
+        return queryResultFuture;
+    }
+
     /**
      * Gets a list with all the services and it status.
      *
      * @return the services urls and its status.
      */
     public Future<ResultSet> getServices() {
-        Future<ResultSet> queryResultFuture = Future.future();
-
-        client.query("SELECT " + Constants.URL + ", " +
-                Constants.STATUS_RESPONSE + ", " +
-                Constants.NAME + ", " +
-                Constants.CREATION_DATE + ", " +
-                Constants.ID + " FROM " + Constants.DATA_BASE_NAME, response -> {
-            if (response.succeeded()) {
-                queryResultFuture.complete(response.result());
-            } else
-                queryResultFuture.fail(response.cause());
-        });
-        return queryResultFuture;
+        return getServices(null);
     }
 
     /**
@@ -63,10 +74,12 @@ public class DBConnector {
         client.update("INSERT INTO " + Constants.DATA_BASE_NAME + " (" +
                         Constants.NAME + "," +
                         Constants.URL + "," +
-                        Constants.CREATION_DATE + ") VALUES ('" +
+                        Constants.CREATION_DATE + "," +
+                        Constants.USER_COOKIE_ID + ") VALUES ('" +
                         service.getString(Constants.NAME) + "', '" +
                         service.getString(Constants.URL) + "', '" +
-                        service.getString(Constants.CREATION_DATE) + "');",
+                        service.getString(Constants.CREATION_DATE) + "', '" +
+                        service.getString(Constants.USER_COOKIE_ID) + "');",
                 ar -> {
                     if (ar.failed()) {
                         logger.error("Was not possible to insert the service. " + ar.cause());
@@ -95,7 +108,7 @@ public class DBConnector {
      * @param id              the id
      * @param status_response the status response
      */
-    public void updateServiceStatusResponse(String id, int status_response) {
+    public void updateServiceStatusResponse(int id, int status_response) {
         client.update("UPDATE " + Constants.DATA_BASE_NAME + " SET " + Constants.STATUS_RESPONSE + " = " + status_response +
                         " WHERE " + Constants.ID + " = " + id,
                 ar -> {
@@ -106,6 +119,26 @@ public class DBConnector {
                     }
                 });
     }
+
+    /**
+     * Update service.
+     *
+     * @param id      the id
+     * @param service the service
+     */
+    public void updateService(int id, JsonObject service) {
+        client.update("UPDATE " + Constants.DATA_BASE_NAME + " SET " +
+                        Constants.NAME + " = '" + service.getString(Constants.NAME) + "', " +
+                        Constants.URL + " = '" + service.getString(Constants.URL) +
+                        "' WHERE " + Constants.ID + " = " + id,
+                ar -> {
+                    if (ar.failed()) {
+                        logger.error("Was not possible to update the service with the following id: " + id + " " +
+                                ar.cause());
+                    }
+                });
+    }
+
 
     /**
      * Query future.

@@ -7,7 +7,9 @@ import io.vertx.core.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public class BackgroundPoller {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Poll services future.
@@ -29,12 +31,16 @@ public class BackgroundPoller {
                 List<JsonArray> results = ar.result().getResults();
                 if (!results.isEmpty()) {
                     ar.result().getResults().forEach(service -> {
-                        String serviceURL = service.getValue(0).toString();
-                        String serviceId = service.getValue(4).toString();
-
-                        int response = getResponseCodeFromUrl(serviceURL);
-                        connector.updateServiceStatusResponse(serviceId, response);
+                        try {
+                            int serviceId = Integer.parseInt(service.getValue(4).toString());
+                            String serviceURL = service.getValue(0).toString();
+                            int response = getResponseCodeFromUrl(serviceURL);
+                            connector.updateServiceStatusResponse(serviceId, response);
+                        } catch (NumberFormatException e) {
+                            Future.failedFuture("Invalid Service ID.");
+                        }
                     });
+
                 }
             } else {
                 logger.error("Could not poll the services.");
@@ -55,8 +61,13 @@ public class BackgroundPoller {
 
             code = connection.getResponseCode();
             connection.disconnect();
+        } catch (UnknownHostException h) {
+            logger.error("Host unknown for the given URL. " + url + " " + h);
+            code = -1;
+        } catch (SocketTimeoutException to) {
+            logger.error("Timeout for the given URL. " + url + " " + to);
         } catch (IOException e) {
-            logger.error("Could not connect to the given URL. " + e);
+            logger.error("Could not connect to the given URL. " + url + " " + e);
         }
         return code;
     }

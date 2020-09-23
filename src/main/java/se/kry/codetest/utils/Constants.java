@@ -35,10 +35,14 @@ public class Constants {
      * The constant CREATION_DATE.
      */
     public static final String CREATION_DATE = "creation_date";
+
     /**
-     * The constant LAST_MODIFIED.
+     * The constant USER_COOKIE_ID.
      */
-    public static final String LAST_MODIFIED = "last_modified";
+    public static final String USER_COOKIE_ID = "user_cookie_id";
+
+
+    public static final String COOKIE_ID = "kry-poller-cookie";
 
     /**
      * The constant DATE_PATTERN.

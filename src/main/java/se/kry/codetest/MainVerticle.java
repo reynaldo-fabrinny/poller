@@ -2,6 +2,7 @@ package se.kry.codetest;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.http.Cookie;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 public class MainVerticle extends AbstractVerticle {
 
     private DBConnector connector;
-    private BackgroundPoller poller = new BackgroundPoller();
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final BackgroundPoller poller = new BackgroundPoller();
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -47,17 +48,21 @@ public class MainVerticle extends AbstractVerticle {
                 });
     }
 
+    //TOD CHECK    .handler(TimeoutHandler.create(5000)
     private void setRoutes(Router router) {
         router.route("/*").handler(StaticHandler.create());
 
         setListServicesRouter(router);
         setAddServiceRouter(router);
         setDeleteServiceRouter(router);
+        setUpdateServiceRouter(router);
     }
 
     private void setListServicesRouter(Router router) {
         router.get("/service").handler(req -> {
-            connector.getServices().onComplete(ar -> {
+
+            Cookie cookie = req.getCookie(Constants.COOKIE_ID);
+            connector.getServices(cookie.getValue()).onComplete(ar -> {
                 if (ar.succeeded()) {
                     List<JsonArray> results = ar.result().getResults();
                     if (!results.isEmpty()) {
@@ -68,7 +73,8 @@ public class MainVerticle extends AbstractVerticle {
                                                 .put(Constants.STATUS_RESPONSE, service.getValue(1))
                                                 .put(Constants.NAME, service.getValue(2))
                                                 .put(Constants.CREATION_DATE, service.getValue(3))
-                                                .put(Constants.ID, service.getValue(4)))
+                                                .put(Constants.ID, service.getValue(4))
+                                                .put(Constants.USER_COOKIE_ID, service.getValue(5)))
                                 .collect(Collectors.toList());
 
                         req.response()
@@ -91,6 +97,16 @@ public class MainVerticle extends AbstractVerticle {
                 logger.error("Invalid URL");
                 return;
             }
+            Cookie cookie = req.getCookie(Constants.COOKIE_ID);
+            String value;
+            if (cookie == null || cookie.getValue() == null) {
+                value = Utils.generateUniqueUserCookieId();
+                req.addCookie(Cookie.cookie(Constants.COOKIE_ID, value));
+            } else {
+                value = cookie.getValue();
+            }
+
+            jsonBody.put(Constants.USER_COOKIE_ID, value);
             jsonBody.put(Constants.CREATION_DATE, Utils.getNow());
             connector.addService(jsonBody);
             req.response()
@@ -110,6 +126,24 @@ public class MainVerticle extends AbstractVerticle {
                         .putHeader("content-type", "text/plain")
                         .end("OK");
             } else {
+                logger.error("Invalid Service ID.");
+                req.fail(404);
+            }
+        });
+    }
+
+    private void setUpdateServiceRouter(Router router) {
+        router.put("/service").handler(req -> {
+            JsonObject jsonBody = req.getBodyAsJson();
+
+            try {
+                int serviceId = Integer.parseInt(jsonBody.getString(Constants.ID));
+                connector.updateService(serviceId, jsonBody);
+                req.response()
+                        .setStatusCode(200)
+                        .putHeader("content-type", "text/plain")
+                        .end("OK");
+            } catch (NumberFormatException e) {
                 req.fail(404);
             }
         });

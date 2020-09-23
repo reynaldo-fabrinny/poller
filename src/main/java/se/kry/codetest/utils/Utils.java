@@ -35,12 +35,17 @@ public class Utils {
     public static boolean isValidUrl(String url) {
         try {
             URI parsedUrl = new URI(url).parseServerAuthority();
-            if (parsedUrl.getScheme() == null || (!parsedUrl.getScheme().equals("http") && !parsedUrl.getScheme().equals("https"))) {
+            if (parsedUrl.getScheme() == null || (!parsedUrl.getScheme().equals("http") &&
+                    !parsedUrl.getScheme().equals("https"))) {
                 return false;
             }
         } catch (URISyntaxException e) {
             return false;
         }
         return true;
+    }
+
+    public static String generateUniqueUserCookieId() {
+        return Math.floor(Math.random() * 21) + new Date().getTime() + "";
     }
 }
