@@ -7,12 +7,16 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import se.kry.codetest.utils.Constants;
 import se.kry.codetest.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,10 +36,16 @@ public class MainVerticle extends AbstractVerticle {
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
 
-        vertx.setPeriodic(Constants.REFRESH_DEFAULT_TIME, timerId ->
-                poller.pollServices(connector.getServices(), vertx));
+        vertx.setPeriodic(Constants.REFRESH_DEFAULT_TIME, timerId -> {
+                    poller.pollServices(connector.getServices(), vertx).onComplete(ar -> {
+                        if (ar.succeeded()) {
+                            List<JsonObject> jsonObjects = parseToJson(ar.result().getResults());
+                            vertx.eventBus().publish(Constants.PAGE_UPDATED, jsonObjects.toString());
+                        }
+                    });
+                }
+        );
         setRoutes(router);
-
         vertx
                 .createHttpServer()
                 .requestHandler(router)
@@ -50,6 +60,21 @@ public class MainVerticle extends AbstractVerticle {
                 });
     }
 
+    private List<JsonObject> parseToJson(List<JsonArray> results) {
+        List<JsonObject> jsonObjects = new ArrayList<>();
+        for (JsonArray result : results) {
+            JsonObject json = new JsonObject();
+            json.put(Constants.URL, result.getValue(0));
+            json.put(Constants.STATUS_RESPONSE, result.getValue(1));
+            json.put(Constants.NAME, result.getValue(2));
+            json.put(Constants.CREATION_DATE, result.getValue(3));
+            json.put(Constants.ID, result.getValue(4));
+            json.put(Constants.USER_COOKIE_ID, result.getValue(5));
+            jsonObjects.add(json);
+        }
+        return jsonObjects;
+    }
+
     private void setRoutes(Router router) {
         router.route("/*").handler(StaticHandler.create());
 
@@ -57,6 +82,16 @@ public class MainVerticle extends AbstractVerticle {
         setAddServiceRouter(router);
         setDeleteServiceRouter(router);
         setUpdateServiceRouter(router);
+        setEventBusRouter(router);
+    }
+
+    private void setEventBusRouter(Router router) {
+        SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
+        SockJSBridgeOptions options = new SockJSBridgeOptions()
+                .addInboundPermitted(new PermittedOptions().setAddress("app.markdown"))
+                .addOutboundPermitted(new PermittedOptions().setAddress("page.updated"));
+        sockJSHandler.bridge(options);
+        router.route("/eventbus/*").handler(sockJSHandler);
     }
 
     private void setListServicesRouter(Router router) {

@@ -13,7 +13,7 @@ public class Constants {
     /**
      * The constant DEFAULT_PORT.
      */
-    public static final int DEFAULT_PORT = 8085;
+    public static final int DEFAULT_PORT = 8080;
 
     /**
      * The constant ID.
@@ -42,6 +42,9 @@ public class Constants {
     public static final String USER_COOKIE_ID = "user_cookie_id";
 
 
+    /**
+     * The constant COOKIE_ID.
+     */
     public static final String COOKIE_ID = "kry-poller-cookie";
 
     /**
@@ -50,7 +53,12 @@ public class Constants {
     public static final String DATE_PATTERN = "HH:mm:ss dd-MM-yyyy";
 
     /**
-     * The constant REFRESH_DEFAULT_TIME.
+     * The constant PAGE_UPDATED.
      */
-    public static final int REFRESH_DEFAULT_TIME = 1000 * 60;
+    public static final String PAGE_UPDATED = "page.updated";
+
+    /**
+     * The constant REFRESH_DEFAULT_TIME.
+     *///TODO SET BACK TO 1 min
+    public static final int REFRESH_DEFAULT_TIME = 500 * 60;
 }

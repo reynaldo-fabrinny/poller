@@ -11,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.List;
 
 /**
  * The type Background poller.
@@ -26,7 +25,7 @@ public class BackgroundPoller {
      * @param vertx
      * @return the future
      */
-    public Future<List<String>> pollServices(Future<ResultSet> futureSet, Vertx vertx) {
+    public Future<ResultSet> pollServices(Future<ResultSet> futureSet, Vertx vertx) {
         DBConnector connector = new DBConnector(vertx);
         futureSet.onComplete(ar -> {
             if (ar.succeeded()) {
@@ -44,7 +43,7 @@ public class BackgroundPoller {
                 logger.error("Could not poll the services.");
             }
         });
-        return Future.succeededFuture();
+        return futureSet;
     }
 
     private int getResponseCodeFromUrl(String url) {

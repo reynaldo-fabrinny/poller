@@ -121,7 +121,6 @@ public class TestMainVerticle {
 
     // TODO Test service visibility by cookie
 
-
     @Test
     @DisplayName("Test get Services")
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
