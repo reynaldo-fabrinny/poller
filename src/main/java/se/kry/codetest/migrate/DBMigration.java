@@ -16,6 +16,7 @@ public class DBMigration {
                 "url VARCHAR(128) NOT NULL, " +
                 "name VARCHAR(128)," +
                 "status_response INTEGER," +
+                "user_cookie_id VARCHAR(128)," +
                 "creation_date DATETIME2(3))").onComplete(done -> {
             if (done.succeeded()) {
                 System.out.println("completed db migrations");
