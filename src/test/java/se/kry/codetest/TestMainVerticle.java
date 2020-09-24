@@ -119,25 +119,6 @@ public class TestMainVerticle {
                 }));
     }
 
-    // TODO Test service visibility by cookie
-
-    @Test
-    @DisplayName("Test get Services")
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    void getServicesTest(Vertx vertx, VertxTestContext testContext) {
-       /* WebClient.create(vertx)
-                .get(Constants.DEFAULT_PORT, "::1", "/service")
-                .send(req -> testContext.verify(() -> {
-                    assertEquals(200, req.result().statusCode());
-                    JsonArray services = req.result().bodyAsJsonArray();
-                    JsonObject service = services.getJsonObject(0);
-
-                    assertNotNull(service.getString(Constants.URL));
-                    assertNotNull(service.getString(Constants.CREATION_DATE));
-                    testContext.completeNow();
-                }));*/
-    }
-
     @Test
     @DisplayName("Test remove existing service")
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
