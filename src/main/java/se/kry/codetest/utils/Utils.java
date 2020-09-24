@@ -34,6 +34,9 @@ public class Utils {
      */
     public static boolean isValidUrl(String url) {
         try {
+            if (url == null || url.equals("")) {
+                return false;
+            }
             URI parsedUrl = new URI(url).parseServerAuthority();
             if (parsedUrl.getScheme() == null || (!parsedUrl.getScheme().equals("http") &&
                     !parsedUrl.getScheme().equals("https"))) {

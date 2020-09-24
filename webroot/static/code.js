@@ -128,7 +128,7 @@ function fillTable(serviceList) {
                                 name: $inputName.val(),
                                 url: $inputUrl.val()
                             })
-                        }).then();
+                        }).then(res => location.reload());
                     } else {
                         alert("invalid url");
                     }
